@@ -668,7 +668,8 @@ const DC=[{id:'c1',nombre:'Tela'},{id:'c2',nombre:'Hilo'},{id:'c3',nombre:'Cierr
 const DU=[{id:'u1',nombre:'Metro'},{id:'u2',nombre:'Unidad'},{id:'u3',nombre:'Rollo'},{id:'u4',nombre:'Gramo'},{id:'u5',nombre:'Paquete'},{id:'u6',nombre:'Caja'},{id:'u7',nombre:'Kg'},{id:'u8',nombre:'Par'}];
 const DM=[{id:'m1',nombre:'Producto defectuoso o dañado'},{id:'m2',nombre:'Color no correspondia'},{id:'m3',nombre:'Medida o cantidad incorrecta'},{id:'m4',nombre:'Talla equivocada'},{id:'m5',nombre:'Se entrego producto equivocado'},{id:'m6',nombre:'Cliente se arrepintio'},{id:'m7',nombre:'Error de cobro o facturacion'},{id:'m8',nombre:'Producto vencido o en mal estado'},{id:'m9',nombre:'Cambio solicitado por el cliente'},{id:'m10',nombre:'Otro'}];
 const LSK='sv4db',LPTS='sv4pts',PMX=8*60*60*1000,FBP='stylos/v4';
-let DB={},FBC=JSON.parse(localStorage.getItem('sv4fbc')||'{}');
+const FBC_DEFAULT={apiKey:"AIzaSyDaMe9zSHDNggP-Xrycey6fFfuvQkuEgC8",authDomain:"almacen-stylos.firebaseapp.com",databaseURL:"https://almacen-stylos-default-rtdb.firebaseio.com",projectId:"almacen-stylos",appId:"1:536901589446:web:8c36e829b78f2f8a7a3ac7",storageBucket:""};
+let DB={},FBC=JSON.parse(localStorage.getItem('sv4fbc')||'null')||FBC_DEFAULT;
 let fbA=null,fbAu=null,fbD=null,fbL=null,CU=null;
 let CART={type:'venta',items:[],cId:'',pId:'',nota:''};
 let SC='Todos',AT='entrada',HF='all',HO={},editTxId=null,editTxType=null,editAdjId=null,editDevId=null;
@@ -1168,7 +1169,7 @@ function xlsMaestros(){
 }
 function rCfg(){document.getElementById('cn').value=DB.config.negocio||'';document.getElementById('cm').value=DB.config.mensajeRecibo||'';document.getElementById('ct').value=DB.config.stockAlertThreshold||5;const ok=fbD&&CU;document.getElementById('fbok').style.display=ok?'block':'none';document.getElementById('fbfm').style.display=ok?'none':'block';if(!ok){const m={fak:'apiKey',fad:'authDomain',fdu:'databaseURL',fpi:'projectId',fai:'appId'};Object.entries(m).forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.value=FBC[k]||'';});}}
 function sFBC(){const c={apiKey:document.getElementById('fak').value.trim(),authDomain:document.getElementById('fad').value.trim(),databaseURL:document.getElementById('fdu').value.trim(),projectId:document.getElementById('fpi').value.trim(),appId:document.getElementById('fai').value.trim(),storageBucket:''};if(!c.apiKey||!c.databaseURL){toast('Completa API Key y Database URL');return;}FBC=c;localStorage.setItem('sv4fbc',JSON.stringify(c));toast('Config guardada. Recarga la app.',4000);}
-function clrFB(){if(!confirm('Desconectar Firebase?'))return;localStorage.removeItem('sv4fbc');FBC={};location.reload();}
+function clrFB(){if(!confirm('Desconectar Firebase?'))return;localStorage.setItem('sv4fbc','{}');FBC={};location.reload();}
 
 // Navigation
 function gV(v){if(lsn)stV();document.querySelectorAll('.view').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.bn').forEach(e=>e.classList.remove('active'));document.getElementById('v-'+v).classList.add('on');const bnId=(v==='mae'||v==='cartera'||v==='cfg'||v==='cierre'||v==='compromisos')?'bn-mas':'bn-'+v;const bn=document.getElementById(bnId);if(bn)bn.classList.add('active');if(v==='hist')rH();if(v==='inv')rI();if(v==='mas')rMC();if(v==='cfg')rCfg();if(v==='cartera')rCartera();if(v==='compromisos'){document.getElementById('cmpAllSi').value='';rCmpAllList();}}
