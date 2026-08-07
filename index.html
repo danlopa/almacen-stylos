@@ -142,15 +142,17 @@ td{padding:9px 6px;border-bottom:1px solid #F8F7F5;vertical-align:middle}td:firs
 .prn{font-size:14px;font-weight:600;line-height:1.3}.prc{font-size:11px;color:#BBB;margin-top:2px}.prp{font-size:14px;font-weight:700;text-align:right;flex-shrink:0;padding-left:8px}.prs{font-size:11px;color:#BBB;text-align:right}
 .chdr{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:2px solid var(--bdr);margin-top:12px;cursor:pointer}.chl{font-size:14px;font-weight:700;color:var(--pri)}
 .cbdy{display:none}.cbdy.open{display:block}
-.citem{display:flex;align-items:center;gap:7px;padding:8px 0;border-bottom:1px solid #F2F1EE}.citem:last-child{border:none}
-.cin{flex:1;font-size:13px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ciq{border:1.5px solid var(--bdr);border-radius:8px;padding:5px 4px;font-size:13px;font-weight:700;width:34px;text-align:center;background:#fff}
-.cistepwrap{display:flex;align-items:center;gap:3px;flex-shrink:0}
-.cistep{border:1.5px solid var(--bdr);border-radius:8px;width:26px;height:26px;font-size:16px;font-weight:800;background:#fff;color:var(--pri);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;line-height:1}
+.citem{padding:12px 0;border-bottom:1px solid #F2F1EE;display:flex;flex-direction:column;gap:10px}.citem:last-child{border:none}
+.cirow1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cirow2{display:flex;align-items:center;gap:10px}
+.cin{flex:1;font-size:15px;font-weight:700;min-width:0;line-height:1.3}
+.ciq{border:1.5px solid var(--bdr);border-radius:10px;padding:8px 4px;font-size:16px;font-weight:800;width:60px;height:40px;text-align:center;background:#fff}
+.cistepwrap{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.cistep{border:1.5px solid var(--bdr);border-radius:10px;width:38px;height:38px;font-size:20px;font-weight:800;background:#fff;color:var(--pri);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;line-height:1}
 .cistep:active{transform:scale(.9);background:var(--bg)}
-.cip{border:1.5px solid var(--bdr);border-radius:8px;padding:5px 7px;font-size:13px;width:78px;text-align:right;background:#fff}
-.csub{font-size:12px;font-weight:800;width:58px;text-align:right;flex-shrink:0;color:var(--pri)}
-.cdel{background:none;border:none;color:#CCC;font-size:18px;padding:0 3px;cursor:pointer}
+.cip{border:1.5px solid var(--bdr);border-radius:10px;padding:8px 9px;font-size:15px;width:88px;height:40px;text-align:right;background:#fff}
+.csub{font-size:15px;font-weight:800;flex:1;text-align:right;color:var(--pri)}
+.cdel{background:var(--bg);border:none;color:var(--red);font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .ctrow{display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-weight:800;font-size:16px;border-top:2px solid var(--bdr);margin-top:4px}
 .cfc{background:var(--bg);border-radius:14px;padding:16px;margin-bottom:14px}
 .cfr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr)}.cfr:last-child{border:none;padding-top:12px}
@@ -497,7 +499,7 @@ td{padding:9px 6px;border-bottom:1px solid #F8F7F5;vertical-align:middle}td:firs
 <div class="ol" id="ol-tx"><div class="sheet"><div class="drag"></div><button class="shx" onclick="cOl('ol-tx')">X</button>
   <div id="txp1">
     <div class="sht" id="txtit">Nueva venta</div>
-    <div class="vbox"><div class="vrow"><button class="mic" id="mb" onclick="tVoice()" title="Buscar por voz">&#127908;</button><input class="si" id="tsi" type="text" placeholder="Buscar producto..." oninput="dFP()" style="flex:1"></div><div class="vres" id="vr"></div><div class="ail" id="ail">Buscando...</div></div>
+    <div class="vbox"><div class="vrow"><button class="mic" id="mb" onclick="tVoice()" title="Buscar por voz">&#127908;</button><input class="si" id="tsi" type="text" placeholder="Buscar producto..." oninput="dFP()" style="flex:1"><button class="aa" onclick="oPFdesdeCarrito()" style="flex-shrink:0">+ Crear</button></div><div class="vres" id="vr"></div><div class="ail" id="ail">Buscando...</div></div>
     <div class="chipswrap"><div class="chips" id="txch"></div></div><div class="plist" id="tpl"></div>
     <div class="chdr" onclick="tCB()"><span class="chl" id="chl">Carrito (0)</span><span id="ca">v</span></div>
     <div class="cbdy open" id="cbd"><div id="ci"><div class="emp" style="padding:12px">Agrega productos</div></div><button class="ibt" onclick="aDescuento()" style="width:100%;margin-bottom:8px;font-size:13px">&#x1F3F7;&#xFE0F; Agregar descuento</button><div class="ctrow" id="ctr" style="display:none"><span>Total</span><span id="ctv">$0</span></div><button class="btnp" id="cco" onclick="gConf()" style="display:none">Continuar</button></div>
@@ -552,7 +554,7 @@ td{padding:9px 6px;border-bottom:1px solid #F8F7F5;vertical-align:middle}td:firs
   <div class="fg"><label>Fecha</label><input type="date" id="adjFecha"></div>
   <button class="btnp b" onclick="svAdj()">Guardar ajuste</button>
 </div></div>
-<div class="ol" id="ol-pf"><div class="sheet"><div class="drag"></div><button class="shx" onclick="cOl('ol-pf')">X</button>
+<div class="ol" id="ol-pf"><div class="sheet"><div class="drag"></div><button class="shx" onclick="_crearYAgregarCarrito=false;cOl('ol-pf')">X</button>
   <div class="sht" id="pftt">Nuevo articulo</div>
   <div class="fr"><div class="fg"><label>Categoria</label><select id="pfc"></select></div><div class="fg"><label>Unidad</label><select id="pfu"></select></div></div>
   <div class="fg"><label>Nombre</label><input type="text" id="pfn" placeholder="Ej: Lino Flex Azul Rey"></div>
@@ -565,7 +567,7 @@ td{padding:9px 6px;border-bottom:1px solid #F8F7F5;vertical-align:middle}td:firs
 <div class="ol" id="ol-cf"><div class="sheet"><div class="drag"></div><button class="shx" onclick="cOl('ol-cf')">X</button><div class="sht" id="cftt">Nueva categoria</div><div class="fg"><label>Nombre</label><input type="text" id="ccnom"></div><input type="hidden" id="cfid"><button class="btnp" onclick="svCat()">Guardar</button></div></div>
 <div class="ol" id="ol-uf"><div class="sheet"><div class="drag"></div><button class="shx" onclick="cOl('ol-uf')">X</button><div class="sht" id="uftt">Nueva unidad</div><div class="fg"><label>Nombre</label><input type="text" id="ufn"></div><input type="hidden" id="ufid"><button class="btnp" onclick="svUnit()">Guardar</button></div></div>
 <div class="ol" id="ol-motf"><div class="sheet"><div class="drag"></div><button class="shx" onclick="cOl('ol-motf')">X</button><div class="sht" id="motftt">Nuevo motivo</div><div class="fg"><label>Nombre</label><input type="text" id="motfn"></div><input type="hidden" id="motfid"><button class="btnp" onclick="svMot()">Guardar</button></div></div>
-<div class="ol" id="ol-kardex"><div class="sheet"><div class="drag"></div><button class="shx" onclick="cOl('ol-kardex')">X</button><div class="sht" id="kxTt">Historial</div><div id="kxList"></div></div></div>
+<div class="ol" id="ol-kardex"><div class="sheet"><div class="drag"></div><button class="shx" onclick="cOl('ol-kardex')">X</button><div class="sht" id="kxTt">Historial</div><div id="kxCreador" style="display:none;font-size:12px;color:var(--gray);margin-bottom:12px"></div><div id="kxList"></div></div></div>
 <div class="ol" id="ol-medf"><div class="sheet"><div class="drag"></div><button class="shx" onclick="cOl('ol-medf')">X</button><div class="sht" id="medftt">Nueva medida</div><div class="fg"><label>Nombre (ej: Busto, Cintura, Largo de manga)</label><input type="text" id="medfn"></div><input type="hidden" id="medfid"><button class="btnp" onclick="svMed()">Guardar</button></div></div>
 <div class="ol" id="ol-pvf"><div class="sheet"><div class="drag"></div><button class="shx" onclick="cOl('ol-pvf')">X</button><div class="sht">Proveedor</div>
   <div class="fg"><label>Nombre</label><input type="text" id="pvfn"></div><div class="fg"><label>Telefono</label><input type="tel" id="pvft"></div><div class="fg"><label>NIT/Notas</label><input type="text" id="pvfi"></div><input type="hidden" id="pvfid">
@@ -691,7 +693,7 @@ function cOl(id){document.getElementById(id).classList.remove('open');if(id==='o
 // Fuzzy
 function nr(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\u00f1/g,'n').replace(/[^a-z0-9\s]/g,'');}
 function lv(a,b){if(a===b)return 0;const m=a.length,n=b.length;let p=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=a[i-1]===b[j-1]?p[j-1]:1+Math.min(p[j],c[j-1],p[j-1]);p=c;}return p[n];}
-function fsc(q,t){const qn=nr(q),tn=nr(t);if(!qn)return 1;if(tn===qn)return 200;if(tn.startsWith(qn))return 150;if(tn.includes(qn))return 100;const qt=qn.split(/\s+/).filter(x=>x.length>1),tt=tn.split(/\s+/);let s=0;qt.forEach(a=>{let b=0;tt.forEach(c=>{if(c===a)b=Math.max(b,50);else if(c.startsWith(a))b=Math.max(b,35);else if(c.includes(a))b=Math.max(b,20);else if(a.length>=3&&lv(a,c)<=Math.floor(a.length/3)+1)b=Math.max(b,10);});s+=b;});return s;}
+function fsc(q,t){const qn=nr(q),tn=nr(t);if(!qn)return 1;if(tn===qn)return 200;if(tn.startsWith(qn))return 150;if(tn.includes(qn))return 100;const qt=qn.split(/\s+/).filter(x=>x.length>1),tt=tn.split(/\s+/);let s=0;qt.forEach(a=>{let b=0;tt.forEach(c=>{if(c===a)b=Math.max(b,50);else if(c.startsWith(a))b=Math.max(b,35);else if(c.includes(a))b=Math.max(b,20);else if(a.length>=4&&lv(a,c)<=Math.floor(a.length/3)+1)b=Math.max(b,10);});s+=b;});return s;}
 function fzy(q,list,fs=['nombre']){if(!(q||'').trim())return list;return list.map(x=>({x,s:Math.max(...fs.map(f=>fsc(q,x[f]||'')))})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.x);}
 
 // Hash
@@ -820,6 +822,11 @@ async function mgr(db){
     if(db.config)db.config.ventaCounter=0;
     db.config.version=17;
   }
+  if(v<18){
+    // Tercera depuracion unica: limpiar los compromisos de costura de prueba (May, Jei, etc.) antes de reemplazar la version compartida con mama.
+    db.compromisos=[];
+    db.config.version=18;
+  }
   return db;
 }
 
@@ -933,6 +940,11 @@ function oKardex(pid){
   const p=(DB.products||[]).find(x=>String(x.id)===String(pid));
   if(!p)return;
   document.getElementById('kxTt').textContent='Historial: '+p.nombre;
+  const infoBits=[];
+  if(p.creadoPor)infoBits.push('Creado por '+p.creadoPor+(p.creadoEn?' el '+fD(p.creadoEn):''));
+  if(p.editadoPor&&p.editadoPor!==p.creadoPor)infoBits.push('Ultima edicion: '+p.editadoPor);
+  document.getElementById('kxCreador').textContent=infoBits.join(' · ');
+  document.getElementById('kxCreador').style.display=infoBits.length?'block':'none';
   const mov=gKardex(pid);
   document.getElementById('kxList').innerHTML=mov.length?mov.map(m=>`<div class="mrow"><div><div class="mn">${m.tipo}</div><div class="md">${fD(m.fecha)}${m.ref?' &middot; '+m.ref:''}</div></div><div style="text-align:right"><div style="font-weight:800;color:${m.cantidad>=0?'var(--grn)':'var(--red)'}">${m.cantidad>=0?'+':''}${fN(m.cantidad)}</div>${m.precio?`<div style="font-size:11px;color:var(--gray)">${fmt(m.precio)}</div>`:''}</div></div>`).join(''):'<div class="emp">Sin movimientos todavia</div>';
   oOl('ol-kardex');
@@ -1064,8 +1076,15 @@ function dlBk(k){const r=localStorage.getItem(k);if(!r)return;const a=document.c
 function iFB(){if(!FBC.apiKey||!FBC.databaseURL)return false;try{if(typeof firebase==='undefined')return false;fbA=firebase.apps.length?firebase.apps[0]:firebase.initializeApp(FBC);fbAu=firebase.auth();fbD=firebase.database();return true;}catch(e){return false;}}
 function sS(s){const d=document.getElementById('sdot'),l=document.getElementById('slbl');const m={ok:['ok','Sincronizado'],off:['off','Sin internet'],err:['err','Error'],local:['','Local']};const[c,t]=m[s]||['','Local'];d.className='sdot'+(c?' '+c:'');l.textContent=t;}
 function stRT(){if(!fbD||!CU)return;if(fbL){try{firebase.database().ref(FBP).off('value',fbL);}catch(e){}fbL=null;}const ref=fbD.ref(FBP);fbL=ref.on('value',sn=>{const d=sn.val();if(d){mFB(d);rHm();rI();}sS('ok');},()=>sS('err'));}
-async function pfB(){if(!fbD||!CU)return;try{const o=a=>{const r={};(a||[]).forEach(x=>r[x.id]=x);return r;};await fbD.ref(FBP).set({config:DB.config,categorias:o(DB.categorias),units:o(DB.units),products:o(DB.products),ventas:o(DB.ventas),compras:o(DB.compras),adjustments:o(DB.adjustments),suppliers:o(DB.suppliers),clients:o(DB.clients),devoluciones:o(DB.devoluciones||[])});sS('ok');}catch(e){sS(navigator.onLine?'err':'off');}}
-function mFB(data){const fo=o=>o?Object.values(o).filter(Boolean):[];if(data.config){const ph=DB.config.pinHash;DB.config={...DB.config,...data.config};if(ph)DB.config.pinHash=ph;}if(data.categorias)DB.categorias=fo(data.categorias);if(data.units)DB.units=fo(data.units);if(data.suppliers)DB.suppliers=fo(data.suppliers);if(data.clients)DB.clients=fo(data.clients);if(data.products){const r=fo(data.products),lm={};DB.products.forEach(p=>lm[p.id]=p);r.forEach(x=>{const l=lm[x.id];if(!l||(x.updatedAt||0)>=(l.updatedAt||0))lm[x.id]=x;});DB.products=Object.values(lm);}const ad=(loc,ro)=>{const r=fo(ro),ids=new Set((loc||[]).map(x=>x.id)),res=[...(loc||[])];r.forEach(x=>{if(!ids.has(x.id))res.push(x);});return res.sort((a,b)=>a.fecha-b.fecha);};DB.ventas=ad(DB.ventas,data.ventas);DB.compras=ad(DB.compras,data.compras);DB.adjustments=ad(DB.adjustments,data.adjustments);DB.devoluciones=ad(DB.devoluciones||[],data.devoluciones);svL();iSt();}
+async function pfB(){if(!fbD||!CU)return;try{const o=a=>{const r={};(a||[]).forEach(x=>r[x.id]=x);return r;};await fbD.ref(FBP).set({config:DB.config,categorias:o(DB.categorias),units:o(DB.units),products:o(DB.products),ventas:o(DB.ventas),compras:o(DB.compras),adjustments:o(DB.adjustments),suppliers:o(DB.suppliers),clients:o(DB.clients),devoluciones:o(DB.devoluciones||[]),pagos:o(DB.pagos||[]),anticipos:o(DB.anticipos||[]),reembolsos:o(DB.reembolsos||[]),cierresCaja:o(DB.cierresCaja||[]),medidas:o(DB.medidas||[]),motivosDevolucion:o(DB.motivosDevolucion||[]),compromisos:o(DB.compromisos||[])});sS('ok');}catch(e){sS(navigator.onLine?'err':'off');}}
+function mFB(data){const fo=o=>o?Object.values(o).filter(Boolean):[];if(data.config){const ph=DB.config.pinHash;DB.config={...DB.config,...data.config};if(ph)DB.config.pinHash=ph;}if(data.categorias)DB.categorias=fo(data.categorias);if(data.units)DB.units=fo(data.units);if(data.suppliers)DB.suppliers=fo(data.suppliers);if(data.clients)DB.clients=fo(data.clients);if(data.medidas)DB.medidas=fo(data.medidas);if(data.motivosDevolucion)DB.motivosDevolucion=fo(data.motivosDevolucion);if(data.products){const r=fo(data.products),lm={};DB.products.forEach(p=>lm[p.id]=p);r.forEach(x=>{const l=lm[x.id];if(!l||(x.updatedAt||0)>=(l.updatedAt||0))lm[x.id]=x;});DB.products=Object.values(lm);}
+  // Fusion 'el mas reciente gana' para lo que se puede editar despues de creado (compara updatedAt, o createdAt/fecha si nunca se edito)
+  const sm=(loc,ro)=>{const r=fo(ro),lm={};(loc||[]).forEach(x=>lm[x.id]=x);r.forEach(x=>{const l=lm[x.id];const tx=x.updatedAt||x.createdAt||x.fecha||0,tl=l?(l.updatedAt||l.createdAt||l.fecha||0):-1;if(!l||tx>=tl)lm[x.id]=x;});return Object.values(lm);};
+  DB.anticipos=sm(DB.anticipos||[],data.anticipos);
+  DB.compromisos=sm(DB.compromisos||[],data.compromisos);
+  DB.cierresCaja=sm(DB.cierresCaja||[],data.cierresCaja);
+  // Fusion 'agregar lo que falte' para lo que solo se acumula, nunca se edita (pagos, reembolsos, ademas de ventas/compras/ajustes/devoluciones ya existentes)
+  const ad=(loc,ro)=>{const r=fo(ro),ids=new Set((loc||[]).map(x=>x.id)),res=[...(loc||[])];r.forEach(x=>{if(!ids.has(x.id))res.push(x);});return res.sort((a,b)=>a.fecha-b.fecha);};DB.ventas=ad(DB.ventas,data.ventas);DB.compras=ad(DB.compras,data.compras);DB.adjustments=ad(DB.adjustments,data.adjustments);DB.devoluciones=ad(DB.devoluciones||[],data.devoluciones);DB.pagos=ad(DB.pagos||[],data.pagos);DB.reembolsos=ad(DB.reembolsos||[],data.reembolsos);svL();iSt();}
 window.addEventListener('online',()=>{if(fbD&&CU)pfB();});
 window.addEventListener('offline',()=>sS('off'));
 
@@ -1140,8 +1159,8 @@ function xlsMaestros(){
   if(typeof XLSX==='undefined'){toast('Cargando...',2000);return;}
   const wb=XLSX.utils.book_new();
   const um={};(DB.units||[]).forEach(u=>um[u.id]=u.nombre);
-  const pR=[['ID','Nombre','Categoria','Unidad','PrecioVenta','Costo','EsServicio','StockSeguridad']];
-  (DB.products||[]).forEach(p=>pR.push([p.id,p.nombre,p.categoria,um[p.unidadId]||'',p.precio_venta||0,p.costo||0,p.esServicio?'Si':'No',p.stockSeguridad??'']));
+  const pR=[['ID','Nombre','Categoria','Unidad','PrecioVenta','Costo','EsServicio','StockSeguridad','CreadoPor']];
+  (DB.products||[]).forEach(p=>pR.push([p.id,p.nombre,p.categoria,um[p.unidadId]||'',p.precio_venta||0,p.costo||0,p.esServicio?'Si':'No',p.stockSeguridad??'',p.creadoPor||'']));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(pR),'Articulos');
   const cR=[['ID','Nombre','StockSeguridad']];
   (DB.categorias||[]).forEach(c=>cR.push([c.id,c.nombre,(DB.config.stockMinCategorias||{})[c.nombre]??'']));
@@ -1594,7 +1613,7 @@ function stepCI(cid,dir){
 }
 function tCB(){const b=document.getElementById('cbd');b.classList.toggle('open');document.getElementById('ca').textContent=b.classList.contains('open')?'v':'^';}
 function uCH(){const n=CART.items.length,t=CART.items.reduce((s,i)=>s+i.subtotal,0);document.getElementById('chl').textContent=(CART.type==='venta'?'Carrito':'Compra')+' ('+n+') - '+fmt(t);const tv=document.getElementById('ctv');if(tv)tv.textContent=fmt(t);}
-function rCart(){const n=CART.items.length,t=CART.items.reduce((s,i)=>s+i.subtotal,0);uCH();const iEl=document.getElementById('ci'),tEl=document.getElementById('ctr'),btn=document.getElementById('cco');if(!n){iEl.innerHTML='<div class="emp" style="padding:12px">Agrega productos</div>';tEl.style.display='none';btn.style.display='none';return;}iEl.innerHTML=CART.items.map(i=>i.esDescuento?`<div class="citem"><div class="cin" style="color:var(--red)">&#x1F3F7;&#xFE0F; ${i.nombre}</div><input class="cip" type="number" inputmode="decimal" value="${Math.abs(i.precio)}" min="0" onchange="uCIDescuento('${i.cartId}',this.value)"><span class="csub" id="cs_${i.cartId}" style="color:var(--red)">-${fmt(Math.abs(i.subtotal))}</span><button class="cdel" onclick="rCI('${i.cartId}')">x</button></div>`:`<div class="citem"><div class="cin" title="${i.nombre}">${i.nombre}</div><div class="cistepwrap"><button class="cistep" type="button" onclick="stepCI('${i.cartId}',-1)">&minus;</button><input class="ciq" type="number" inputmode="decimal" value="${i.cantidad}" min="0.1" step="0.1" onchange="uCI('${i.cartId}','cantidad',this.value)"><button class="cistep" type="button" onclick="stepCI('${i.cartId}',1)">+</button></div><input class="cip" type="number" inputmode="decimal" value="${i.precio}" min="0" onchange="uCI('${i.cartId}','precio',this.value)"><span class="csub" id="cs_${i.cartId}">${fmt(i.subtotal)}</span><button class="cdel" onclick="rCI('${i.cartId}')">x</button></div>`).join('');tEl.style.display='flex';btn.style.display='block';document.getElementById('ctv').textContent=fmt(t);
+function rCart(){const n=CART.items.length,t=CART.items.reduce((s,i)=>s+i.subtotal,0);uCH();const iEl=document.getElementById('ci'),tEl=document.getElementById('ctr'),btn=document.getElementById('cco');if(!n){iEl.innerHTML='<div class="emp" style="padding:12px">Agrega productos</div>';tEl.style.display='none';btn.style.display='none';return;}iEl.innerHTML=CART.items.map(i=>i.esDescuento?`<div class="citem"><div class="cirow1"><div class="cin" style="color:var(--red)">&#x1F3F7;&#xFE0F; ${i.nombre}</div><button class="cdel" onclick="rCI('${i.cartId}')">&times;</button></div><div class="cirow2"><input class="cip" type="number" inputmode="decimal" value="${Math.abs(i.precio)}" min="0" oninput="uCIDescuento('${i.cartId}',this.value)"><span class="csub" id="cs_${i.cartId}" style="color:var(--red)">-${fmt(Math.abs(i.subtotal))}</span></div></div>`:`<div class="citem"><div class="cirow1"><div class="cin" title="${i.nombre}">${i.nombre}</div><button class="cdel" onclick="rCI('${i.cartId}')">&times;</button></div><div class="cirow2"><div class="cistepwrap"><button class="cistep" type="button" onclick="stepCI('${i.cartId}',-1)">&minus;</button><input class="ciq" type="number" inputmode="decimal" value="${i.cantidad}" min="0.1" step="0.1" oninput="uCI('${i.cartId}','cantidad',this.value)"><button class="cistep" type="button" onclick="stepCI('${i.cartId}',1)">+</button></div><input class="cip" type="number" inputmode="decimal" value="${i.precio}" min="0" oninput="uCI('${i.cartId}','precio',this.value)"><span class="csub" id="cs_${i.cartId}">${fmt(i.subtotal)}</span></div></div>`).join('');tEl.style.display='flex';btn.style.display='block';document.getElementById('ctv').textContent=fmt(t);
 // Auto-open cart when items added
 const cbd=document.getElementById('cbd');if(cbd&&!cbd.classList.contains('open')){cbd.classList.add('open');document.getElementById('ca').textContent='v';}}
 function gConf(){if(!CART.items.length){toast('Agrega al menos un producto');return;}for(const i of CART.items){if(i.cantidad<=0){toast('Cantidad invalida: '+i.nombre);return;}if(!i.esDescuento&&i.precio<0){toast('Precio negativo: '+i.nombre);return;}}
@@ -1665,7 +1684,25 @@ function setPagoInicial(refType,refId,entidadId,entidadNombre,monto,fecha,medioP
   else DB.pagos.push({id:uid(),refType,refId,entidadId,entidadNombre,monto,fecha,origen:'inicial',medioPago:mp,nota:'',deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''});
 }
 function clienteDatosCompletos(cId){const c=(DB.clients||[]).find(x=>x.id===cId);return !!(c&&c.cedula&&c.cedula.trim()&&c.telefono&&c.telefono.trim());}
-function nextVentaNumero(){DB.config.ventaCounter=(DB.config.ventaCounter||0)+1;return DB.config.ventaCounter;}
+async function nextVentaNumero(){
+  if(fbD&&CU){
+    try{
+      const ref=fbD.ref(FBP+'/config/ventaCounter');
+      const res=await ref.transaction(cur=>(cur||DB.config.ventaCounter||0)+1);
+      if(res.committed&&res.snapshot.val()!=null){
+        const n=res.snapshot.val();
+        DB.config.ventaCounter=n;
+        return n;
+      }
+    }catch(e){/* sin conexion u otro problema: sigue al respaldo local de abajo */}
+  }
+  // Respaldo local (sin internet): incrementa y se asegura de no repetir un numero ya usado en esta copia
+  let n=(DB.config.ventaCounter||0)+1;
+  const usados=new Set((DB.ventas||[]).map(v=>v.numero));
+  while(usados.has(n))n++;
+  DB.config.ventaCounter=n;
+  return n;
+}
 // Fecha editable en transacciones: 'fecha' es la fecha de negocio (editable), createdAt sigue siendo la fecha real del sistema.
 function toDateInputVal(ts){const d=new Date(ts);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function fromDateInputCombineNow(dateStr){if(!dateStr)return Date.now();const[y,m,d]=dateStr.split('-').map(Number);const now=new Date();return new Date(y,m-1,d,now.getHours(),now.getMinutes(),now.getSeconds(),now.getMilliseconds()).getTime();}
@@ -1758,7 +1795,10 @@ async function sTx2(){
     if(estadoPago==='fiado'&&!cId){toast('Selecciona o crea un cliente: la venta queda fiada');return;}
     if(estadoPago==='fiado'&&!clienteDatosCompletos(cId)){toast('Para dejar esta venta fiada, el cliente necesita cedula y telefono registrados (evita confundir clientes con el mismo nombre)');return;}
     const cl=(DB.clients||[]).find(c=>c.id===cId);
-    const venta={id:txId,numero:nextVentaNumero(),fecha:fechaMs,clienteId:cId,clienteNombre:cl?cl.nombre:'',items:[...CART.items],total:tot,nota,estado:'activa',pagoRecibido:pgRec,pagadoVenta:pagado,vueltas,saldoPendiente,estadoPago,medioPago,entregaFecha:entregaMs,entregada:entregaMs?false:null,deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''};
+    const ventaNumero=await nextVentaNumero();
+    const venta={id:txId,numero:ventaNumero,fecha:fechaMs,clienteId:cId,clienteNombre:cl?cl.nombre:'',items:[...CART.items],total:tot,nota,estado:'activa',pagoRecibido:pgRec,pagadoVenta:pagado,vueltas,saldoPendiente,estadoPago,medioPago,entregaFecha:entregaMs,entregada:entregaMs?false:null,deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''};
+    // Blindaje final: revisa el objeto real justo antes de guardar, no puede quedar fiado sin cliente pase lo que pase antes.
+    if((venta.saldoPendiente||0)>0.004&&!venta.clienteId){toast('No se puede dejar una venta fiada sin cliente. Elige un cliente o marca que se pagó completo.');return;}
     DB.ventas.push(venta);setPagoInicial('venta',venta.id,cId,cl?cl.nombre:'',pagadoCash,venta.fecha,medioPago);
     if(antAplicar>0.004)consumirAnticipo(cId,cl?cl.nombre:'',antAplicar,venta.id,'Aplicado a venta del '+fD(venta.fecha));
     if(CART.compromisoId){
@@ -1893,8 +1933,18 @@ function rMC(){const mcp=document.getElementById('mcp');if(mcp)mcp.textContent=(
 
 // Productos
 function uPfSrv(){const w=document.getElementById('pfsk-wrap'),w2=document.getElementById('pfss-wrap'),esSrv=document.getElementById('pfsrv').checked;if(w)w.style.display=esSrv?'none':'block';if(w2)w2.style.display=esSrv?'none':'block';}
-function oPF(p=null){ePid=p?p.id:null;document.getElementById('pftt').textContent=p?'Editar articulo':'Nuevo articulo';const cs=document.getElementById('pfc');cs.innerHTML=(DB.categorias||[]).map(c=>`<option value="${c.nombre}">${c.nombre}</option>`).join('');const us=document.getElementById('pfu');us.innerHTML=(DB.units||[]).map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');if(p){cs.value=p.categoria;us.value=p.unidadId||'u2';document.getElementById('pfn').value=p.nombre||'';document.getElementById('pfpv').value=p.precio_venta||'';document.getElementById('pfco').value=p.costo||'';document.getElementById('pfsk').value='';document.getElementById('pfss').value=p.stockSeguridad??'';document.getElementById('pfsrv').checked=!!p.esServicio;}else{['pfn','pfpv','pfco','pfsk','pfss'].forEach(id=>document.getElementById(id).value='');document.getElementById('pfsrv').checked=false;}uPfSrv();document.getElementById('pfid').value=ePid||'';oOl('ol-pf');}
-async function svProd(){const nom=document.getElementById('pfn').value.trim();if(!nom){toast('Ingresa nombre');return;}const catSel=document.getElementById('pfc').value;if((DB.products||[]).some(p=>String(p.id)!==String(ePid)&&p.categoria===catSel&&nr(p.nombre)===nr(nom))){toast('Este articulo ya existe en esta categoria');return;}const pv=parseFloat(document.getElementById('pfpv').value)||0,co=parseFloat(document.getElementById('pfco').value)||0,stk=parseFloat(document.getElementById('pfsk').value)||0,esSrv=document.getElementById('pfsrv').checked,ssRaw=document.getElementById('pfss').value,ss=ssRaw===''?null:parseFloat(ssRaw)||0;if(pv<0||co<0){toast('Precios no negativos');return;}const prod={id:ePid||uid(),categoria:document.getElementById('pfc').value,unidadId:document.getElementById('pfu').value,nombre:nom,precio_venta:pv,costo:co,esServicio:esSrv,stockSeguridad:ss,updatedAt:Date.now()};if(ePid){const idx=(DB.products||[]).findIndex(p=>String(p.id)===String(ePid));if(idx>=0)DB.products[idx]={...DB.products[idx],...prod};}else{DB.products.push(prod);}if(!ePid&&!esSrv&&stk>0){DB.adjustments.push({id:uid(),fecha:Date.now(),productId:prod.id,producto:nom,categoria:prod.categoria,tipo:'fijar',cantidad:stk,costo:co,stockAntes:0,motivo:'Stock inicial',deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''});}iSt();svL();await pfB();cOl('ol-pf');rMP();rI();rMC();toast(ePid?'Articulo actualizado':'Articulo creado');}
+// Crear un articulo nuevo sin salir del carrito de venta/compra: se abre encima, y al guardar se agrega solo al carrito.
+let _crearYAgregarCarrito=false;
+function oPFdesdeCarrito(){
+  oPF();
+  _crearYAgregarCarrito=true;
+  if(SC&&SC!=='Todos'){const cs=document.getElementById('pfc');if(cs)cs.value=SC;}
+}
+function oPF(p=null){_crearYAgregarCarrito=false;ePid=p?p.id:null;document.getElementById('pftt').textContent=p?'Editar articulo':'Nuevo articulo';const cs=document.getElementById('pfc');cs.innerHTML=(DB.categorias||[]).map(c=>`<option value="${c.nombre}">${c.nombre}</option>`).join('');const us=document.getElementById('pfu');us.innerHTML=(DB.units||[]).map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');if(p){cs.value=p.categoria;us.value=p.unidadId||'u2';document.getElementById('pfn').value=p.nombre||'';document.getElementById('pfpv').value=p.precio_venta||'';document.getElementById('pfco').value=p.costo||'';document.getElementById('pfsk').value='';document.getElementById('pfss').value=p.stockSeguridad??'';document.getElementById('pfsrv').checked=!!p.esServicio;}else{['pfn','pfpv','pfco','pfsk','pfss'].forEach(id=>document.getElementById(id).value='');document.getElementById('pfsrv').checked=false;}uPfSrv();document.getElementById('pfid').value=ePid||'';oOl('ol-pf');}
+async function svProd(){const nom=document.getElementById('pfn').value.trim();if(!nom){toast('Ingresa nombre');return;}const catSel=document.getElementById('pfc').value;if((DB.products||[]).some(p=>String(p.id)!==String(ePid)&&p.categoria===catSel&&nr(p.nombre)===nr(nom))){toast('Este articulo ya existe en esta categoria');return;}const pv=parseFloat(document.getElementById('pfpv').value)||0,co=parseFloat(document.getElementById('pfco').value)||0,stk=parseFloat(document.getElementById('pfsk').value)||0,esSrv=document.getElementById('pfsrv').checked,ssRaw=document.getElementById('pfss').value,ss=ssRaw===''?null:parseFloat(ssRaw)||0;if(pv<0||co<0){toast('Precios no negativos');return;}const quien=CU?.email||'local';const prod={id:ePid||uid(),categoria:document.getElementById('pfc').value,unidadId:document.getElementById('pfu').value,nombre:nom,precio_venta:pv,costo:co,esServicio:esSrv,stockSeguridad:ss,updatedAt:Date.now(),editadoPor:quien};const esNuevo=!ePid;if(ePid){const idx=(DB.products||[]).findIndex(p=>String(p.id)===String(ePid));if(idx>=0)DB.products[idx]={...DB.products[idx],...prod};}else{prod.creadoPor=quien;prod.creadoEn=Date.now();DB.products.push(prod);}if(esNuevo&&!esSrv&&stk>0){DB.adjustments.push({id:uid(),fecha:Date.now(),productId:prod.id,producto:nom,categoria:prod.categoria,tipo:'fijar',cantidad:stk,costo:co,stockAntes:0,motivo:'Stock inicial',deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''});}iSt();svL();await pfB();cOl('ol-pf');rMP();rI();rMC();
+  if(esNuevo&&_crearYAgregarCarrito){_crearYAgregarCarrito=false;aC2(prod.id);toast('Articulo creado y agregado al carrito');}
+  else toast(ePid?'Articulo actualizado':'Articulo creado');
+}
 async function dProd(id){if(!confirm('Eliminar articulo?'))return;DB.products=(DB.products||[]).filter(p=>String(p.id)!==String(id));iSt();svL();await pfB();rMP();rI();rMC();toast('Eliminado');}
 
 // Pagination state
