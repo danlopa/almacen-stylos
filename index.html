@@ -2408,7 +2408,10 @@ async function anularV(id){
   v.anuladaPor=CU?.uid||'admin';
   if(antConsumido>0.004){
     if(!DB.anticipos)DB.anticipos=[];
-    DB.anticipos.push({id:uid(),clienteId:v.clienteId,clienteNombre:v.clienteNombre,monto:Math.round(antConsumido*100)/100,tipo:'creacion',refVentaId:'',nota:'Devuelto: la venta '+(v.numero?fVNum(v.numero):id)+' que lo uso fue anulada',fecha:Date.now(),deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''});
+    const idDevolucion='anular_'+v.id;
+    if(!DB.anticipos.some(a=>a.id===idDevolucion)){
+      DB.anticipos.push({id:idDevolucion,clienteId:v.clienteId,clienteNombre:v.clienteNombre,monto:Math.round(antConsumido*100)/100,tipo:'creacion',refVentaId:'',nota:'Devuelto: la venta '+(v.numero?fVNum(v.numero):id)+' que lo uso fue anulada',fecha:Date.now(),deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''});
+    }
   }
   iSt(); // Invalidate stock cache - anuladas are excluded in cSt()
   autoBk();svL();await pfB();
