@@ -1083,8 +1083,12 @@ function mFB(data){const fo=o=>o?Object.values(o).filter(Boolean):[];if(data.con
   DB.anticipos=sm(DB.anticipos||[],data.anticipos);
   DB.compromisos=sm(DB.compromisos||[],data.compromisos);
   DB.cierresCaja=sm(DB.cierresCaja||[],data.cierresCaja);
-  // Fusion 'agregar lo que falte' para lo que solo se acumula, nunca se edita (pagos, reembolsos, ademas de ventas/compras/ajustes/devoluciones ya existentes)
-  const ad=(loc,ro)=>{const r=fo(ro),ids=new Set((loc||[]).map(x=>x.id)),res=[...(loc||[])];r.forEach(x=>{if(!ids.has(x.id))res.push(x);});return res.sort((a,b)=>a.fecha-b.fecha);};DB.ventas=ad(DB.ventas,data.ventas);DB.compras=ad(DB.compras,data.compras);DB.adjustments=ad(DB.adjustments,data.adjustments);DB.devoluciones=ad(DB.devoluciones||[],data.devoluciones);DB.pagos=ad(DB.pagos||[],data.pagos);DB.reembolsos=ad(DB.reembolsos||[],data.reembolsos);svL();iSt();rbSt();}
+  DB.ventas=sm(DB.ventas,data.ventas).sort((a,b)=>a.fecha-b.fecha);
+  DB.compras=sm(DB.compras,data.compras).sort((a,b)=>a.fecha-b.fecha);
+  DB.adjustments=sm(DB.adjustments,data.adjustments).sort((a,b)=>a.fecha-b.fecha);
+  DB.devoluciones=sm(DB.devoluciones||[],data.devoluciones).sort((a,b)=>a.fecha-b.fecha);
+  // Fusion 'agregar lo que falte' solo para lo que nunca se edita despues de creado (pagos, reembolsos)
+  const ad=(loc,ro)=>{const r=fo(ro),ids=new Set((loc||[]).map(x=>x.id)),res=[...(loc||[])];r.forEach(x=>{if(!ids.has(x.id))res.push(x);});return res.sort((a,b)=>a.fecha-b.fecha);};DB.pagos=ad(DB.pagos||[],data.pagos);DB.reembolsos=ad(DB.reembolsos||[],data.reembolsos);svL();iSt();rbSt();}
 window.addEventListener('online',()=>{if(fbD&&CU)pfB();});
 window.addEventListener('offline',()=>sS('off'));
 
