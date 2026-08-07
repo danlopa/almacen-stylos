@@ -827,6 +827,28 @@ async function mgr(db){
     db.compromisos=[];
     db.config.version=18;
   }
+  if(v<19){
+    // Corregir pagos "iniciales" duplicados: la misma venta/compra termino con 2 registros de pago distintos
+    // (bug de sincronizacion ya corregido). Se queda con el mas reciente de cada grupo y borra el resto.
+    if(db.pagos&&db.pagos.length){
+      const porRef={};
+      db.pagos.forEach(p=>{
+        if(p.origen!=='inicial')return;
+        if(!porRef[p.refId])porRef[p.refId]=[];
+        porRef[p.refId].push(p);
+      });
+      const idsABorrar=new Set();
+      Object.values(porRef).forEach(grupo=>{
+        if(grupo.length<=1)return;
+        grupo.sort((a,b)=>(b.updatedAt||b.createdAt||b.fecha||0)-(a.updatedAt||a.createdAt||a.fecha||0));
+        const ganador=grupo[0];
+        ganador.id='ini_'+ganador.refId;
+        for(let i=1;i<grupo.length;i++)idsABorrar.add(grupo[i].id);
+      });
+      if(idsABorrar.size)db.pagos=db.pagos.filter(p=>!idsABorrar.has(p.id));
+    }
+    db.config.version=19;
+  }
   return db;
 }
 
@@ -1087,8 +1109,9 @@ function mFB(data){const fo=o=>o?Object.values(o).filter(Boolean):[];if(data.con
   DB.compras=sm(DB.compras,data.compras).sort((a,b)=>a.fecha-b.fecha);
   DB.adjustments=sm(DB.adjustments,data.adjustments).sort((a,b)=>a.fecha-b.fecha);
   DB.devoluciones=sm(DB.devoluciones||[],data.devoluciones).sort((a,b)=>a.fecha-b.fecha);
-  // Fusion 'agregar lo que falte' solo para lo que nunca se edita despues de creado (pagos, reembolsos)
-  const ad=(loc,ro)=>{const r=fo(ro),ids=new Set((loc||[]).map(x=>x.id)),res=[...(loc||[])];r.forEach(x=>{if(!ids.has(x.id))res.push(x);});return res.sort((a,b)=>a.fecha-b.fecha);};DB.pagos=ad(DB.pagos||[],data.pagos);DB.reembolsos=ad(DB.reembolsos||[],data.reembolsos);svL();iSt();rbSt();}
+  DB.pagos=sm(DB.pagos||[],data.pagos).sort((a,b)=>a.fecha-b.fecha);
+  DB.reembolsos=sm(DB.reembolsos||[],data.reembolsos).sort((a,b)=>a.fecha-b.fecha);
+  svL();iSt();rbSt();}
 window.addEventListener('online',()=>{if(fbD&&CU)pfB();});
 window.addEventListener('offline',()=>sS('off'));
 
@@ -1682,10 +1705,11 @@ function gBk(){const pg=parseFloat(document.getElementById('pgRec').value);if(!i
 function setPagoInicial(refType,refId,entidadId,entidadNombre,monto,fecha,medioPago){
   if(!DB.pagos)DB.pagos=[];
   const mp=medioPago||'efectivo';
-  const p=DB.pagos.find(x=>x.refId===refId&&x.origen==='inicial');
+  const idFijo='ini_'+refId; // ID fijo y predecible: nunca puede duplicarse entre dispositivos, sin importar quien lo cree o edite
+  const p=DB.pagos.find(x=>x.id===idFijo||(x.refId===refId&&x.origen==='inicial'));
   if(monto<=0.004){if(p)DB.pagos=DB.pagos.filter(x=>x!==p);return;}
-  if(p){p.monto=monto;p.fecha=fecha;p.entidadId=entidadId;p.entidadNombre=entidadNombre;p.medioPago=mp;}
-  else DB.pagos.push({id:uid(),refType,refId,entidadId,entidadNombre,monto,fecha,origen:'inicial',medioPago:mp,nota:'',deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''});
+  if(p){p.id=idFijo;p.monto=monto;p.fecha=fecha;p.entidadId=entidadId;p.entidadNombre=entidadNombre;p.medioPago=mp;p.updatedAt=Date.now();}
+  else DB.pagos.push({id:idFijo,refType,refId,entidadId,entidadNombre,monto,fecha,origen:'inicial',medioPago:mp,nota:'',deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''});
 }
 function clienteDatosCompletos(cId){const c=(DB.clients||[]).find(x=>x.id===cId);return !!(c&&c.cedula&&c.cedula.trim()&&c.telefono&&c.telefono.trim());}
 async function nextVentaNumero(){
