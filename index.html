@@ -693,8 +693,37 @@ function cOl(id){document.getElementById(id).classList.remove('open');if(id==='o
 // Fuzzy
 function nr(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\u00f1/g,'n').replace(/[^a-z0-9\s]/g,'');}
 function lv(a,b){if(a===b)return 0;const m=a.length,n=b.length;let p=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=a[i-1]===b[j-1]?p[j-1]:1+Math.min(p[j],c[j-1],p[j-1]);p=c;}return p[n];}
-function fsc(q,t){const qn=nr(q),tn=nr(t);if(!qn)return 1;if(tn===qn)return 200;if(tn.startsWith(qn))return 150;if(tn.includes(qn))return 100;const qt=qn.split(/\s+/).filter(x=>x.length>1),tt=tn.split(/\s+/);let s=0;qt.forEach(a=>{let b=0;tt.forEach(c=>{if(c===a)b=Math.max(b,50);else if(c.startsWith(a))b=Math.max(b,35);else if(c.includes(a))b=Math.max(b,20);else if(a.length>=4&&lv(a,c)<=Math.floor(a.length/3)+1)b=Math.max(b,10);});s+=b;});return s;}
-function fzy(q,list,fs=['nombre']){if(!(q||'').trim())return list;return list.map(x=>({x,s:Math.max(...fs.map(f=>fsc(q,x[f]||'')))})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.x);}
+// Distancia con letras intercambiadas contando como 1 error (ej: "pze" por "pez")
+function dlv(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;const d=[];for(let i=0;i<=m;i++){d[i]=[i];}for(let j=1;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++){const c=a[i-1]===b[j-1]?0:1;d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c);if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1])d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1);}return d[m][n];}
+// Forma "sonora" de una palabra: b/v, s/z/c, ll/y, h muda, letras dobles y "es" inicial no cuentan como error
+function fsonk(w){return w.replace(/^es(?=[^aeiou])/,'s').replace(/ll/g,'y').replace(/qu/g,'k').replace(/c(?=[ei])/g,'s').replace(/z/g,'s').replace(/c/g,'k').replace(/v/g,'b').replace(/h/g,'').replace(/w/g,'u').replace(/(.)\1+/g,'$1');}
+const FSC_SKIP=new Set(['de','la','el','en','y','con','para','por','los','las','un','una','del','al']);
+function nrs(s){return nr(s).replace(/\s+/g,' ').trim();}
+// Puntaje de una palabra buscada (a) contra una palabra del texto (c). 0 = no coincide.
+function mtk(a,c){const hasD=/\d/.test(a);
+  if(c===a)return 50;
+  if(hasD){ // medidas y numeros (x18L, 110x150, 5): exactos; solo se permite prefijo o contenido si tienen 3+ caracteres
+    if(a.length>=3){if(c.startsWith(a))return 35;if(c.includes(a))return 20;}
+    return 0;}
+  if(c.startsWith(a))return 35;
+  if(a.length>=4&&c.includes(a))return 20;
+  if(a.length>=3){const ka=fsonk(a),kc=fsonk(c);
+    if(ka===kc)return 30;
+    if(a.length===3){if(c.length===3&&[...a].sort().join('')===[...c].sort().join('')&&dlv(a,c)===1)return 10;return 0;}
+    if(ka.length>=4&&kc.startsWith(ka))return 25;
+    const lim=ka.length<=5?1:2;
+    if(Math.abs(ka.length-kc.length)<=lim&&dlv(ka,kc)<=lim)return 10;
+    if(ka.length>=5&&dlv(ka,kc.slice(0,ka.length))<=1)return 8;}
+  return 0;}
+// Busqueda rigurosa: TODAS las palabras buscadas deben aparecer (con tolerancia a errores de ortografia solo en palabras sin numeros)
+function fsc(q,t){const qn=nrs(q),tn=nrs(t);if(!qn)return 1;if(tn===qn)return 200;if(tn.startsWith(qn))return 150;if((' '+tn).includes(' '+qn))return 100;
+  let qt=qn.split(' ').filter(x=>/\d/.test(x)||(x.length>1&&!FSC_SKIP.has(x)));
+  if(!qt.length)qt=qn.split(' ').filter(x=>x.length>0);
+  const tt=tn.split(' ');let s=0;
+  for(const a of qt){let b=0;for(const c of tt){const m=mtk(a,c);if(m>b)b=m;if(b===50)break;}if(b===0)return 0;s+=b;}
+  return s;}
+// Con varios campos (nombre + categoria) se evalua cada campo y tambien todos juntos
+function fzy(q,list,fs=['nombre']){if(!(q||'').trim())return list;return list.map(x=>({x,s:Math.max(...fs.map(f=>fsc(q,x[f]||'')),fs.length>1?fsc(q,fs.map(f=>x[f]||'').join(' ')):0)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.x);}
 
 // Hash
 async function hsh(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s+'sv4salt'));return Array.from(new Uint8Array(b)).map(b=>b.toString(16).padStart(2,'0')).join('');}
@@ -848,6 +877,36 @@ async function mgr(db){
       if(idsABorrar.size)db.pagos=db.pagos.filter(p=>!idsABorrar.has(p.id));
     }
     db.config.version=19;
+  }
+  if(v<20){
+    // Corregir los 4 servicios de Confeccion duplicados: cada dispositivo los creo por separado (migracion v10)
+    // la primera vez que abrio la app, con IDs distintos para lo que debian ser los mismos 4 servicios.
+    const nombresServicio=['Confeccion a medida','Arreglo / Ajuste','Diseno y patronaje','Otro servicio'].map(nr);
+    if(db.products&&db.products.length){
+      const grupos={};
+      db.products.forEach(p=>{
+        if(!p.esServicio)return;
+        if(!nombresServicio.includes(nr(p.nombre)))return;
+        const clave=p.categoria+'|'+nr(p.nombre);
+        if(!grupos[clave])grupos[clave]=[];
+        grupos[clave].push(p);
+      });
+      const mapaReemplazo={},idsABorrarProd=new Set();
+      Object.values(grupos).forEach(grupo=>{
+        if(grupo.length<=1)return;
+        grupo.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+        const ganador=grupo[0];
+        for(let i=1;i<grupo.length;i++){mapaReemplazo[grupo[i].id]=ganador.id;idsABorrarProd.add(grupo[i].id);}
+      });
+      if(idsABorrarProd.size){
+        (db.ventas||[]).forEach(t=>(t.items||[]).forEach(i=>{if(mapaReemplazo[i.productId])i.productId=mapaReemplazo[i.productId];}));
+        (db.compras||[]).forEach(t=>(t.items||[]).forEach(i=>{if(mapaReemplazo[i.productId])i.productId=mapaReemplazo[i.productId];}));
+        (db.adjustments||[]).forEach(a=>{if(mapaReemplazo[a.productId])a.productId=mapaReemplazo[a.productId];});
+        (db.devoluciones||[]).forEach(d=>{if(mapaReemplazo[d.productId])d.productId=mapaReemplazo[d.productId];});
+        db.products=db.products.filter(p=>!idsABorrarProd.has(p.id));
+      }
+    }
+    db.config.version=20;
   }
   return db;
 }
@@ -1085,11 +1144,11 @@ function cdTogglePagos(tid){cdOpen[tid]=!cdOpen[tid];rCdList();}
 function cdPagar(){const t=cdTipo,i=cdId;cOl('ol-cartdet');oAbono(t,i);}
 
 // Storage
-function svL(){try{localStorage.setItem(LSK,JSON.stringify(DB));}catch(e){}}
+function svL(){const t=JSON.stringify(DB);try{localStorage.setItem(LSK,t);}catch(e){try{['sv4b4','sv4b3','sv4b2','sv4b1','sv4b0'].forEach(k=>localStorage.removeItem(k));localStorage.setItem(LSK,t);toast('Memoria del navegador casi llena: se borraron los respaldos automaticos locales para no perder datos');}catch(e2){toast('ATENCION: la memoria del navegador esta llena y no se pudo guardar localmente. Descarga un respaldo JSON ahora.');}}}
 async function ldL(){const r=localStorage.getItem(LSK);if(r){try{DB=await mgr(JSON.parse(r));}catch(e){DB=await mgr({});}}else{DB=await mgr({});}if(!DB.config.pinHash)DB.config.pinHash=await hsh('1234');iSt();}
 
 // Backups
-function autoBk(){try{const ks=['sv4b0','sv4b1','sv4b2','sv4b3','sv4b4'];for(let i=4;i>0;i--){const p=localStorage.getItem(ks[i-1]);if(p)localStorage.setItem(ks[i],p);}localStorage.setItem(ks[0],JSON.stringify({...DB,_at:Date.now()}));}catch(e){}}
+function autoBk(){try{const ks=['sv4b0','sv4b1','sv4b2','sv4b3','sv4b4'];const arr=[JSON.stringify({...DB,_at:Date.now()})];ks.forEach(k=>{const p=localStorage.getItem(k);if(p)arr.push(p);});ks.forEach(k=>localStorage.removeItem(k));let usado=0;for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);usado+=k.length+(localStorage.getItem(k)||'').length;}const LIM=3600000;let j=0;for(const p of arr){if(j>=ks.length||usado+p.length>LIM)break;try{localStorage.setItem(ks[j],p);usado+=p.length;j++;}catch(e){break;}}}catch(e){}}
 function sBkL(){const ks=['sv4b0','sv4b1','sv4b2','sv4b3','sv4b4'];const el=document.getElementById('bkl');let h='';ks.forEach((k,i)=>{const r=localStorage.getItem(k);if(!r)return;try{const d=JSON.parse(r);h+=`<div class="mrow"><div><div class="mn">Respaldo ${i===0?'reciente':'#'+(i+1)}</div><div class="md">${d._at?fD(d._at):'?'} - ${(r.length/1024).toFixed(1)}KB</div></div><div class="macts"><button class="eb" onclick="rsBk('${k}')">Restaurar</button><button class="eb" onclick="dlBk('${k}')">DL</button></div></div>`;}catch(e){}});el.innerHTML=h||'<div class="emp">Sin respaldos</div>';oOl('ol-bk');}
 async function rsBk(k){const r=localStorage.getItem(k);if(!r){toast('No encontrado');return;}if(!confirm('Restaurar este respaldo?'))return;autoBk();try{DB=await mgr(JSON.parse(r));svL();await pfB();iSt();rHm();rI();rH();cOl('ol-bk');toast('Datos restaurados');}catch(e){toast('Error');}}
 function dlBk(k){const r=localStorage.getItem(k);if(!r)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r],{type:'application/json'}));a.download='sv4bk_'+Date.now()+'.json';a.click();}
@@ -1969,7 +2028,7 @@ function oPFdesdeCarrito(){
   if(SC&&SC!=='Todos'){const cs=document.getElementById('pfc');if(cs)cs.value=SC;}
 }
 function oPF(p=null){_crearYAgregarCarrito=false;ePid=p?p.id:null;document.getElementById('pftt').textContent=p?'Editar articulo':'Nuevo articulo';const cs=document.getElementById('pfc');cs.innerHTML=(DB.categorias||[]).map(c=>`<option value="${c.nombre}">${c.nombre}</option>`).join('');const us=document.getElementById('pfu');us.innerHTML=(DB.units||[]).map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');if(p){cs.value=p.categoria;us.value=p.unidadId||'u2';document.getElementById('pfn').value=p.nombre||'';document.getElementById('pfpv').value=p.precio_venta||'';document.getElementById('pfco').value=p.costo||'';document.getElementById('pfsk').value='';document.getElementById('pfss').value=p.stockSeguridad??'';document.getElementById('pfsrv').checked=!!p.esServicio;}else{['pfn','pfpv','pfco','pfsk','pfss'].forEach(id=>document.getElementById(id).value='');document.getElementById('pfsrv').checked=false;}uPfSrv();document.getElementById('pfid').value=ePid||'';oOl('ol-pf');}
-async function svProd(){const nom=document.getElementById('pfn').value.trim();if(!nom){toast('Ingresa nombre');return;}const catSel=document.getElementById('pfc').value;if((DB.products||[]).some(p=>String(p.id)!==String(ePid)&&p.categoria===catSel&&nr(p.nombre)===nr(nom))){toast('Este articulo ya existe en esta categoria');return;}const pv=parseFloat(document.getElementById('pfpv').value)||0,co=parseFloat(document.getElementById('pfco').value)||0,stk=parseFloat(document.getElementById('pfsk').value)||0,esSrv=document.getElementById('pfsrv').checked,ssRaw=document.getElementById('pfss').value,ss=ssRaw===''?null:parseFloat(ssRaw)||0;if(pv<0||co<0){toast('Precios no negativos');return;}const quien=CU?.email||'local';const prod={id:ePid||uid(),categoria:document.getElementById('pfc').value,unidadId:document.getElementById('pfu').value,nombre:nom,precio_venta:pv,costo:co,esServicio:esSrv,stockSeguridad:ss,updatedAt:Date.now(),editadoPor:quien};const esNuevo=!ePid;if(ePid){const idx=(DB.products||[]).findIndex(p=>String(p.id)===String(ePid));if(idx>=0)DB.products[idx]={...DB.products[idx],...prod};}else{prod.creadoPor=quien;prod.creadoEn=Date.now();DB.products.push(prod);}if(esNuevo&&!esSrv&&stk>0){DB.adjustments.push({id:uid(),fecha:Date.now(),productId:prod.id,producto:nom,categoria:prod.categoria,tipo:'fijar',cantidad:stk,costo:co,stockAntes:0,motivo:'Stock inicial',deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''});}iSt();svL();await pfB();cOl('ol-pf');rMP();rI();rMC();
+async function svProd(){const nom=document.getElementById('pfn').value.trim();if(!nom){toast('Ingresa nombre');return;}const catSel=document.getElementById('pfc').value;if((DB.products||[]).some(p=>String(p.id)!==String(ePid)&&p.categoria===catSel&&nr(p.nombre)===nr(nom))){toast('Este articulo ya existe en esta categoria');return;}const pv=parseFloat(document.getElementById('pfpv').value)||0,co=parseFloat(document.getElementById('pfco').value)||0,stk=parseFloat(document.getElementById('pfsk').value)||0,esSrv=document.getElementById('pfsrv').checked,ssRaw=document.getElementById('pfss').value,ss=ssRaw===''?null:parseFloat(ssRaw)||0;if(pv<0||co<0){toast('Precios no negativos');return;}if(!ePid&&_crearYAgregarCarrito&&!esSrv&&!(stk>0)){if(!confirm('Este articulo se esta creando SIN stock inicial.\n\nSi lo vendes ahora, el inventario quedara en negativo.\n\nAceptar = crear sin stock\nCancelar = volver y escribir el stock inicial'))return;}const quien=CU?.email||'local';const prod={id:ePid||uid(),categoria:document.getElementById('pfc').value,unidadId:document.getElementById('pfu').value,nombre:nom,precio_venta:pv,costo:co,esServicio:esSrv,stockSeguridad:ss,updatedAt:Date.now(),editadoPor:quien};const esNuevo=!ePid;if(ePid){const idx=(DB.products||[]).findIndex(p=>String(p.id)===String(ePid));if(idx>=0)DB.products[idx]={...DB.products[idx],...prod};}else{prod.creadoPor=quien;prod.creadoEn=Date.now();DB.products.push(prod);}if(esNuevo&&!esSrv&&stk>0){DB.adjustments.push({id:uid(),fecha:Date.now(),productId:prod.id,producto:nom,categoria:prod.categoria,tipo:'fijar',cantidad:stk,costo:co,stockAntes:0,motivo:'Stock inicial',deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''});}iSt();svL();await pfB();cOl('ol-pf');rMP();rI();rMC();
   if(esNuevo&&_crearYAgregarCarrito){_crearYAgregarCarrito=false;aC2(prod.id);toast('Articulo creado y agregado al carrito');}
   else toast(ePid?'Articulo actualizado':'Articulo creado');
 }
