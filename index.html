@@ -711,7 +711,8 @@ function mtk(a,c){const hasD=/\d/.test(a);
     if(ka===kc)return 30;
     if(a.length===3){if(c.length===3&&[...a].sort().join('')===[...c].sort().join('')&&dlv(a,c)===1)return 10;return 0;}
     if(ka.length>=4&&kc.startsWith(ka))return 25;
-    const lim=ka.length<=5?1:2;
+    if(ka[0]!==kc[0])return 0;
+    const lim=a.length>=9?2:1;
     if(Math.abs(ka.length-kc.length)<=lim&&dlv(ka,kc)<=lim)return 10;
     if(ka.length>=5&&dlv(ka,kc.slice(0,ka.length))<=1)return 8;}
   return 0;}
@@ -1157,7 +1158,7 @@ function dlBk(k){const r=localStorage.getItem(k);if(!r)return;const a=document.c
 function iFB(){if(!FBC.apiKey||!FBC.databaseURL)return false;try{if(typeof firebase==='undefined')return false;fbA=firebase.apps.length?firebase.apps[0]:firebase.initializeApp(FBC);fbAu=firebase.auth();fbD=firebase.database();return true;}catch(e){return false;}}
 function sS(s){const d=document.getElementById('sdot'),l=document.getElementById('slbl');const m={ok:['ok','Sincronizado'],off:['off','Sin internet'],err:['err','Error'],local:['','Local']};const[c,t]=m[s]||['','Local'];d.className='sdot'+(c?' '+c:'');l.textContent=t;}
 function stRT(){if(!fbD||!CU)return;if(fbL){try{firebase.database().ref(FBP).off('value',fbL);}catch(e){}fbL=null;}const ref=fbD.ref(FBP);fbL=ref.on('value',sn=>{const d=sn.val();if(d){mFB(d);rHm();rI();if(document.getElementById('v-hist')?.classList.contains('on'))rH();}sS('ok');},()=>sS('err'));}
-async function pfB(){if(!fbD||!CU)return;try{const o=a=>{const r={};(a||[]).forEach(x=>r[x.id]=x);return r;};await fbD.ref(FBP).set({config:DB.config,categorias:o(DB.categorias),units:o(DB.units),products:o(DB.products),ventas:o(DB.ventas),compras:o(DB.compras),adjustments:o(DB.adjustments),suppliers:o(DB.suppliers),clients:o(DB.clients),devoluciones:o(DB.devoluciones||[]),pagos:o(DB.pagos||[]),anticipos:o(DB.anticipos||[]),reembolsos:o(DB.reembolsos||[]),cierresCaja:o(DB.cierresCaja||[]),medidas:o(DB.medidas||[]),motivosDevolucion:o(DB.motivosDevolucion||[]),compromisos:o(DB.compromisos||[])});sS('ok');}catch(e){sS(navigator.onLine?'err':'off');}}
+async function pfB(){if(!fbD||!CU)return;try{const o=a=>{const r={};(a||[]).forEach(x=>r[x.id]=x);return r;};let hecho=false;await Promise.race([fbD.ref(FBP).set({config:DB.config,categorias:o(DB.categorias),units:o(DB.units),products:o(DB.products),ventas:o(DB.ventas),compras:o(DB.compras),adjustments:o(DB.adjustments),suppliers:o(DB.suppliers),clients:o(DB.clients),devoluciones:o(DB.devoluciones||[]),pagos:o(DB.pagos||[]),anticipos:o(DB.anticipos||[]),reembolsos:o(DB.reembolsos||[]),cierresCaja:o(DB.cierresCaja||[]),medidas:o(DB.medidas||[]),motivosDevolucion:o(DB.motivosDevolucion||[]),compromisos:o(DB.compromisos||[])}).then(()=>{hecho=true;}),new Promise(r=>setTimeout(r,6000))]);sS(hecho?'ok':'off');}catch(e){sS(navigator.onLine?'err':'off');}}
 function mFB(data){const fo=o=>o?Object.values(o).filter(Boolean):[];if(data.config){const ph=DB.config.pinHash;DB.config={...DB.config,...data.config};if(ph)DB.config.pinHash=ph;}if(data.categorias)DB.categorias=fo(data.categorias);if(data.units)DB.units=fo(data.units);if(data.suppliers)DB.suppliers=fo(data.suppliers);if(data.clients)DB.clients=fo(data.clients);if(data.medidas)DB.medidas=fo(data.medidas);if(data.motivosDevolucion)DB.motivosDevolucion=fo(data.motivosDevolucion);if(data.products){const r=fo(data.products),lm={};DB.products.forEach(p=>lm[p.id]=p);r.forEach(x=>{const l=lm[x.id];if(!l||(x.updatedAt||0)>=(l.updatedAt||0))lm[x.id]=x;});DB.products=Object.values(lm);}
   // Fusion 'el mas reciente gana' para lo que se puede editar despues de creado (compara updatedAt, o createdAt/fecha si nunca se edito)
   const sm=(loc,ro)=>{const r=fo(ro),lm={};(loc||[]).forEach(x=>lm[x.id]=x);r.forEach(x=>{const l=lm[x.id];const tx=x.updatedAt||x.createdAt||x.fecha||0,tl=l?(l.updatedAt||l.createdAt||l.fecha||0):-1;if(!l||tx>=tl)lm[x.id]=x;});return Object.values(lm);};
@@ -1775,7 +1776,7 @@ async function nextVentaNumero(){
   if(fbD&&CU){
     try{
       const ref=fbD.ref(FBP+'/config/ventaCounter');
-      const res=await ref.transaction(cur=>(cur||DB.config.ventaCounter||0)+1);
+      const res=await Promise.race([ref.transaction(cur=>(cur||DB.config.ventaCounter||0)+1),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),4000))]);
       if(res.committed&&res.snapshot.val()!=null){
         const n=res.snapshot.val();
         DB.config.ventaCounter=n;
@@ -1804,8 +1805,17 @@ function chequeoFechaStock(items,fechaMs){
   return afectados;
 }
 function fVNum(n){return n?'V-'+String(n).padStart(6,'0'):'';}
+let _guardandoTx=false;
+// Envoltorio: evita doble guardado mientras una venta se esta guardando
 async function sTx2(){
+  if(_guardandoTx){toast('Guardando... espera un momento');return;}
+  _guardandoTx=true;
+  try{await sTx2Int();}finally{_guardandoTx=false;}
+}
+async function sTx2Int(){
   if(!CART.items.length){toast('Carrito vacio');return;}
+  // Foto del carrito en el momento de pulsar Guardar: lo que se guarda es lo que habia ahi, aunque despues se abra otra venta
+  const _items=CART.items.map(i=>({...i})),_cmpId=CART.compromisoId;
   const tot=CART.items.reduce((s,i)=>s+i.subtotal,0),nota=document.getElementById('ni').value.trim();
   if(CART.type==='compra'&&tot<=0.004){toast('El total de la compra no puede ser $0');return;}
   if(CART.type==='venta'&&tot<=0.004){if(!confirm('¿Estas segura de registrar esta venta en $0?'))return;}
@@ -1883,13 +1893,13 @@ async function sTx2(){
     if(estadoPago==='fiado'&&!clienteDatosCompletos(cId)){toast('Para dejar esta venta fiada, el cliente necesita cedula y telefono registrados (evita confundir clientes con el mismo nombre)');return;}
     const cl=(DB.clients||[]).find(c=>c.id===cId);
     const ventaNumero=await nextVentaNumero();
-    const venta={id:txId,numero:ventaNumero,fecha:fechaMs,clienteId:cId,clienteNombre:cl?cl.nombre:'',items:[...CART.items],total:tot,nota,estado:'activa',pagoRecibido:pgRec,pagadoVenta:pagado,vueltas,saldoPendiente,estadoPago,medioPago,entregaFecha:entregaMs,entregada:entregaMs?false:null,deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''};
+    const venta={id:txId,numero:ventaNumero,fecha:fechaMs,clienteId:cId,clienteNombre:cl?cl.nombre:'',items:_items,total:tot,nota,estado:'activa',pagoRecibido:pgRec,pagadoVenta:pagado,vueltas,saldoPendiente,estadoPago,medioPago,entregaFecha:entregaMs,entregada:entregaMs?false:null,deviceId:DID,createdAt:Date.now(),userId:CU?.uid||''};
     // Blindaje final: revisa el objeto real justo antes de guardar, no puede quedar fiado sin cliente pase lo que pase antes.
     if((venta.saldoPendiente||0)>0.004&&!venta.clienteId){toast('No se puede dejar una venta fiada sin cliente. Elige un cliente o marca que se pagó completo.');return;}
     DB.ventas.push(venta);setPagoInicial('venta',venta.id,cId,cl?cl.nombre:'',pagadoCash,venta.fecha,medioPago);
     if(antAplicar>0.004)consumirAnticipo(cId,cl?cl.nombre:'',antAplicar,venta.id,'Aplicado a venta del '+fD(venta.fecha));
-    if(CART.compromisoId){
-      const cmp=(DB.compromisos||[]).find(x=>x.id===CART.compromisoId);
+    if(_cmpId){
+      const cmp=(DB.compromisos||[]).find(x=>x.id===_cmpId);
       if(cmp){cmp.estado='entregado';cmp.ventaId=venta.id;cmp.updatedAt=Date.now();}
     }
     iSt();autoBk();svL();await pfB();cOl('ol-tx');shTir2(venta);rHm();rI();
